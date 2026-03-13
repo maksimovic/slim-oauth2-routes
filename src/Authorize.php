@@ -56,7 +56,7 @@ final class Authorize implements RouteCallbackInterface
         OAuth2\Server $server,
         $view,
         $template = '/authorize.phtml',
-        UserIdProviderInterface $userIdProvider = null
+        ?UserIdProviderInterface $userIdProvider = null
     ) {
         if (!is_object($view) || !method_exists($view, 'render')) {
             throw new \InvalidArgumentException('$view must implement a render() method');

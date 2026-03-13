@@ -5,7 +5,7 @@ namespace Chadicus\Slim\OAuth2\Routes;
 use Chadicus\Slim\OAuth2\Http\RequestBridge;
 use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\message\ResponseInterface;
+use Psr\Http\Message\ResponseInterface;
 use OAuth2;
 
 /**

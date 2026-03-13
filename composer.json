@@ -1,12 +1,12 @@
 {
-    "name": "chadicus/slim-oauth2-routes",
+    "name": "maksimovic/slim-oauth2-routes",
     "description": "OAuth2 routes for use within a Slim Framework API",
     "keywords": ["slim", "oauth2", "routing"],
     "license": "MIT",
     "require": {
-        "php": "^5.6 || ^7.0 || ^8.0",
+        "php": "^8.1",
         "bshaffer/oauth2-server-php": "^1.9",
-        "chadicus/slim-oauth2-http": "^3.2"
+        "maksimovic/slim-oauth2-http": "^3.0"
     },
     "suggest": {
         "chadicus/slim-oauth2-middleware": "Adds OAuth2 middleware for API requests.",
@@ -16,8 +16,8 @@
         "sort-packages": true
     },
     "require-dev": {
-        "laminas/laminas-diactoros": "^1.8 || ^2.0",
-        "phpunit/phpunit": "^5.7 || ^6.5 || ^9.6 || ^10.1",
+        "laminas/laminas-diactoros": "^2.0 || ^3.0",
+        "phpunit/phpunit": "^10.5",
         "slim/php-view": "^2.0.5",
         "squizlabs/php_codesniffer": "^3.7"
     },
@@ -28,7 +28,14 @@
         "psr-4": {"ChadicusTest\\Slim\\OAuth2\\Routes\\" : "tests"}
     },
     "scripts": {
-        "lint": "vendor/bin/phpcs",
-        "test": "vendor/bin/phpunit"
-    }
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-text --coverage-html build/coverage --coverage-clover build/logs/clover.xml",
+        "cs-check": "phpcs"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/maksimovic/slim-oauth2-http.git"
+        }
+    ]
 }

@@ -270,6 +270,8 @@ HTML;
                     'expires' => $expires,
                     'scope' => null,
                     'id_token' => null,
+                    'code_challenge' => null,
+                    'code_challenge_method' => null,
                 ],
             ],
             $storage->authorizationCodes
