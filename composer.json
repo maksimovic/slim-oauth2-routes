@@ -6,10 +6,10 @@
     "require": {
         "php": "^8.1",
         "bshaffer/oauth2-server-php": "^1.9",
-        "maksimovic/slim-oauth2-http": "^3.0"
+        "maksimovic/slim-oauth2-http": "^4.0"
     },
     "suggest": {
-        "chadicus/slim-oauth2-middleware": "Adds OAuth2 middleware for API requests.",
+        "maksimovic/slim-oauth2-middleware": "Adds OAuth2 middleware for API requests.",
         "slim/php-view": "Simple template rendering"
     },
     "config" : {
@@ -31,11 +31,5 @@
         "test": "phpunit",
         "test:coverage": "phpunit --coverage-text --coverage-html build/coverage --coverage-clover build/logs/clover.xml",
         "cs-check": "phpcs"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/maksimovic/slim-oauth2-http.git"
-        }
-    ]
+    }
 }
