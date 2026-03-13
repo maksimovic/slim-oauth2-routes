@@ -15,7 +15,6 @@ use Slim\Views;
  * Unit tests for the \Chadicus\Slim\OAuth2\Routes\ReceiveCode class.
  *
  * @coversDefaultClass \Chadicus\Slim\OAuth2\Routes\ReceiveCode
- * @covers ::<private>
  * @covers ::__construct
  */
 final class ReceiveCodeTest extends TestCase
@@ -79,6 +78,29 @@ final class ReceiveCodeTest extends TestCase
     }
 
     /**
+     * Verify behavior of __invoke() when no code param is present.
+     *
+     * @test
+     * @covers ::__invoke
+     *
+     * @return void
+     */
+    public function invokeWithoutCode()
+    {
+        $view = new Views\PhpRenderer(__DIR__ . '/../templates');
+
+        $route = new ReceiveCode($view);
+
+        $request = new ServerRequest();
+        $response = $route($request, new Response());
+
+        $expectedBody = "<h2>The authorization code is </h2>\n";
+
+        $this->assertSame($expectedBody, (string)$response->getBody());
+        $this->assertSame('text/html', $response->getHeaderLine('Content-Type'));
+    }
+
+    /**
      * Verify behavior of __construct() when $view is invalid.
      *
      * @test
@@ -90,7 +112,6 @@ final class ReceiveCodeTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$view must implement a render() method');
-        $server = new OAuth2\Server(new Storage\Memory([]), [], []);
-        new ReceiveCode($server, new \StdClass());
+        new ReceiveCode(new \StdClass());
     }
 }

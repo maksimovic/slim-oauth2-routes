@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
  * Unit tests for the \Chadicus\Slim\OAuth2\Routes\Revoke class.
  *
  * @coversDefaultClass \Chadicus\Slim\OAuth2\Routes\Revoke
- * @covers ::<private>
  * @covers ::__construct
  */
 final class RevokeTest extends TestCase

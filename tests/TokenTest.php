@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
  * Unit tests for the \Chadicus\Slim\OAuth2\Routes\Token class.
  *
  * @coversDefaultClass \Chadicus\Slim\OAuth2\Routes\Token
- * @covers ::<private>
  * @covers ::__construct
  */
 final class TokenTest extends TestCase

@@ -3,19 +3,20 @@
 namespace ChadicusTest\Slim\OAuth2\Routes;
 
 use Chadicus\Slim\OAuth2\Routes\Authorize;
+use Chadicus\Slim\OAuth2\Routes\UserIdProviderInterface;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Stream;
 use OAuth2;
 use OAuth2\Storage;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views;
 
 /**
  * Unit tests for the \Chadicus\Slim\OAuth2\Routes\Authorize class.
  *
  * @coversDefaultClass \Chadicus\Slim\OAuth2\Routes\Authorize
- * @covers ::<private>
  * @covers ::__construct
  */
 final class AuthorizeTest extends TestCase
@@ -276,6 +277,133 @@ HTML;
             ],
             $storage->authorizationCodes
         );
+    }
+
+    /**
+     * Verify behavior of __invoke() with a custom UserIdProviderInterface.
+     *
+     * @test
+     * @covers ::__construct
+     * @covers ::__invoke
+     *
+     * @return void
+     */
+    public function invokeWithCustomUserIdProvider()
+    {
+        $storage = new Storage\Memory(
+            [
+                'client_credentials' => [
+                    'testClientId' => [
+                        'client_id' => 'testClientId',
+                        'client_secret' => 'testClientSecret',
+                    ],
+                ],
+            ]
+        );
+        $server = new OAuth2\Server($storage, ['allow_implicit' => true], []);
+
+        $view = new Views\PhpRenderer(__DIR__ . '/../templates/');
+
+        $customProvider = new class implements UserIdProviderInterface {
+            public function getUserId(ServerRequestInterface $request, array $arguments = [])
+            {
+                return 'customUserId';
+            }
+        };
+
+        $route = new Authorize($server, $view, '/authorize.phtml', $customProvider);
+
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, 'authorized=yes');
+        rewind($stream);
+
+        $request = new ServerRequest(
+            [],
+            [],
+            'http://example.com/authorize',
+            'POST',
+            new Stream($stream),
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            [],
+            [
+                'client_id' => 'testClientId',
+                'redirect_uri' => 'http://example.com',
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            ['authorized' => 'yes']
+        );
+
+        $response = $route($request, new Response());
+
+        $this->assertSame(302, $response->getStatusCode());
+
+        $location = array_pop($response->getHeaders()['Location']);
+        $parts = parse_url($location);
+        parse_str($parts['query'], $query);
+
+        $this->assertTrue(isset($query['code']));
+
+        $this->assertSame('customUserId', $storage->authorizationCodes[$query['code']]['user_id']);
+    }
+
+    /**
+     * Verify behavior of __invoke() when authorization is denied.
+     *
+     * @test
+     * @covers ::__invoke
+     *
+     * @return void
+     */
+    public function invokeAuthorizationDenied()
+    {
+        $storage = new Storage\Memory(
+            [
+                'client_credentials' => [
+                    'testClientId' => [
+                        'client_id' => 'testClientId',
+                        'client_secret' => 'testClientSecret',
+                    ],
+                ],
+            ]
+        );
+        $server = new OAuth2\Server($storage, ['allow_implicit' => true], []);
+
+        $view = new Views\PhpRenderer(__DIR__ . '/../templates/');
+
+        $route = new Authorize($server, $view);
+
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, 'authorized=no');
+        rewind($stream);
+
+        $request = new ServerRequest(
+            [],
+            [],
+            'http://example.com/authorize',
+            'POST',
+            new Stream($stream),
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            [],
+            [
+                'client_id' => 'testClientId',
+                'redirect_uri' => 'http://example.com',
+                'response_type' => 'code',
+                'state' => 'test',
+            ],
+            ['authorized' => 'no']
+        );
+
+        $response = $route($request, new Response());
+
+        $this->assertSame(302, $response->getStatusCode());
+
+        $location = array_pop($response->getHeaders()['Location']);
+        $parts = parse_url($location);
+        parse_str($parts['query'], $query);
+
+        $this->assertSame('access_denied', $query['error']);
+        $this->assertSame('test', $query['state']);
     }
 
     private function getRequest(Stream $body)
