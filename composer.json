@@ -3,6 +3,9 @@
     "description": "OAuth2 routes for use within a Slim Framework API",
     "keywords": ["slim", "oauth2", "routing"],
     "license": "MIT",
+    "replace": {
+        "chadicus/slim-oauth2-routes": "self.version"
+    },
     "require": {
         "php": "^8.1",
         "bshaffer/oauth2-server-php": "^1.9",
